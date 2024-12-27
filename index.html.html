@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كشف كلمة السر</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: url('https://www.raed.net/img?id=1159072') no-repeat center center fixed;
+            background-size: cover;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .container {
+            margin: 20px auto;
+            max-width: 100px;
+            padding: 20px;
+            border: 1px solid #cccccc00;
+            border-radius: 70px;
+            background-color: #ffffff00;
+        }
+
+        input[type="file"] {
+            margin: 10px 0;
+        }
+
+        .password {
+            margin-top: 60px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .credits {
+            margin-top: 50px;
+            font-size: 20px;
+            color: #00ff0d;
+            animation: glow 1.5s infinite;
+        }
+
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px #0228ff; }
+            50% { text-shadow: 0 0 20px #1100ff; }
+            100% { text-shadow: 0 0 5px #0400ff; }
+        }
+    </style>
+</head>
+<body>
+    <h1>كشف كلمة السر باستخدام الباركود</h1>
+    <div class="container">
+        <label for="barcode-image">اختر صورة الباركود:</label>
+        <input type="file" id="barcode-image" accept="image/*">
+        <button onclick="revealPassword()">كشف كلمة السر</button>
+
+        <div class="password" id="password-display">كلمة السر ستظهر هنا</div>
+    </div>
+
+    <div class="credits">تمت البرمجة بواسطة HZ</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+    <script>
+        function revealPassword() {
+            const fileInput = document.getElementById('barcode-image');
+            const passwordDisplay = document.getElementById('password-display');
+
+            if (!fileInput.files.length) {
+                alert('يرجى اختيار صورة باركود.');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(event) {
+                const img = new Image();
+                img.src = event.target.result;
+
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+                    const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+                    if (code) {
+                        passwordDisplay.textContent = `كلمة السر: ${code.data}`;
+                    } else {
+                        passwordDisplay.textContent = 'لم يتم العثور على باركود صالح.';
+                    }
+                };
+            };
+
+            reader.readAsDataURL(file);
+        }
+    </script>
+</body>
+</html>
